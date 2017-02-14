@@ -1,0 +1,99 @@
+---
+title: "Index Match Equivalent"
+author: "Michael Gordon"
+date: "10 February 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Package and Data
+
+As usual we will be using the dplyr package. They key function here is left_join. We complete both one to one matching, one to many matching and one to many matching. 
+
+First lets load the packages and the data sets. 
+
+```{r cars}
+# Load Package
+library(dplyr)
+# Create Concordance
+Meshblock <- c(100,200,300,400,600,800,1000,1200,1400,1600,2400,3000)
+Catchment <- c('City Centre','City Centre','Urban Area','Urban Area','Urban Area','Urban Area','Industrial Area','Rural Area','Rural Area','Rural Area','Rural Area','Rural Area')
+Catchment_areas <- data.frame(Meshblock,Catchment)
+head(Catchment_areas,12)
+
+# Create Data Set
+Meshblock <- c(100,200,300,400,600,800,1000,1200,1400,1600,2400,3000)
+Population <- c(3025,4567,2309,3001,1002,7891,205,107,89,401,145,231)
+
+Population_data <- data.frame(Meshblock,Population) 
+head(Population_data,12)
+```
+
+## One to One Matching  
+Left_join() adds all of dataframe to another using a column as a key.  In this case, using Meshblock as a common column we will match the catchment names to the Population data set.
+
+```{r}
+Catchment_Population_data <- Population_data %>% 
+  left_join(Catchment_areas)
+
+head(Catchment_Population_data,12)
+```
+Note it specifies which column it is matching on - keep a watch of this as it may match on a column you dont want. 
+The catchments are now matched with meshblocks
+  
+## Many to One Matching
+Lets say that I want to know the catchments and population of only a few meshblocks. 
+```{r}
+# Create Data set
+study_area <- c(100,1200,3000)
+study_area <- data.frame(study_area)
+
+# Match complete data set with new data set
+study_area_catchments <- study_area %>% 
+  left_join(Catchment_Population_data, by =c("study_area" = "Meshblock"))
+
+head(study_area_catchments)
+```
+Note that as my 2 data frames did not have a shared column with the same column name, I had to specify which columns to join as (or index from)
+
+
+## One to Many Matching 
+Lets re-adjust the initial data frame so that there is more than one instance of each meshblock
+```{r}
+Year <- c(2014,2014,2014,2014,2014,2014,2014,2014,2014,2014,2014,2014,2015,2015,2015,2015,2015,2015,2015,2015,2015,2015,2015,2015)
+Meshblock <- c(100,200,300,400,600,800,1000,1200,1400,1600,2400,3000,100,200,300,400,600,800,1000,1200,1400,1600,2400,3000)
+Population <- c(3025,4567,2309,3001,1002,7891,205,107,89,401,145,231,3056,4578,2240,4000,1060,7999,267,197,109,501,162,267)
+
+new_population_data <- data.frame(Year,Meshblock,Population)
+```
+Now we match the same as we did before, and the catchments will match with the correct meshblock.
+```{r}
+catchment_new_population_data <- new_population_data %>% 
+  left_join(Catchment_areas)
+
+head(catchment_new_population_data,24)
+```
+
+## Index Match Match
+What if we wanted to match on more than one column. For instance if the catchment changes depending on the year, i.e some land goes from rural to industrial. This means we would need to match on the year and the meshblock.
+```{r}
+# Re-define catchments 
+new_Year <- c(2014,2014,2014,2014,2014,2014,2014,2014,2014,2014,2014,2014,2015,2015,2015,2015,2015,2015,2015,2015,2015,2015,2015,2015)
+new_Meshblock <- c(100,200,300,400,600,800,1000,1200,1400,1600,2400,3000,100,200,300,400,600,800,1000,1200,1400,1600,2400,3000)
+new_Catchment <- c('City Centre','City Centre','Urban Area','Urban Area','Urban Area','Urban Area','Industrial Area','Rural Area','Rural Area','Rural Area','Rural Area','Rural Area','City Centre','City Centre','City Centre','Urban Area','Urban Area','Urban Area','Industrial Area','Industrial Area','Rural Area','Rural Area','Urban Area','Urban Area')
+new_catchments <- data.frame(new_Year,new_Meshblock,new_Catchment)
+
+```
+Now We left join based on 2 columns. I have also arranged by Meshblock so that its easier to see.
+```{r}
+new_catchment_new_population_data <- new_population_data %>% 
+  left_join(new_catchments, by = c("Year" = "new_Year", "Meshblock" = "new_Meshblock")) %>% 
+  arrange(Meshblock)
+
+head(new_catchment_new_population_data,24)
+```
+
+

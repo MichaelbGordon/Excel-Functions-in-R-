@@ -1,0 +1,55 @@
+---
+title: "Sumif / Sumifs"
+author: "Michael Gordon"
+date: "9 February 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## How to run sumif/sumifs functions in R
+
+As with most data manipulation we will be using the dplyr package, which is part of the [tidyverse](https://blog.rstudio.org/2016/09/15/tidyverse-1-0-0/). The key function for us is summarise(). The summarise() function will create summary statistics for a given column in the data frame such as finding the mean or summing. 
+ 
+I will use the package dplyr and will create a data set below.
+```{r cars}
+# Load Package
+library(dplyr)
+# Create Dataframe
+Area <- c("Auckland","Auckland","Auckland","Waikato","Waikato","Waikato","Wellington","Wellington","Wellington","Rest of New Zealand","Rest of New Zealand","Rest of New Zealand")
+Industry <- c("Primary","Secondary","Tertiary","Primary","Secondary","Tertiary","Primary","Secondary","Tertiary","Primary","Secondary","Tertiary")
+GDP <- c(56,200,354,150,75,79,45,67,197,300,420,77)
+GEOs <- c(1001,2678,5080,506,768,923,1076,111,234,678,299,651)
+MECs <- c(3000,7689,15903,1589,2134,2765,3200,345,700,1901,1100,1789)
+data <- data.frame(Area,Industry,GDP,GEOs,MECs)
+
+# View Data Frame
+head(data,12)
+```
+ 
+Lets try summarise a column - using sum() inside summarise
+
+```{r}
+data %>% summarise(sum(GDP))
+```
+ 
+A major strength of dplyr is the ability to group the data by a variable or variables and then operate on the data "by group". Here we shall sum by MECs by Industry. This is the equivalent of Sumifs.
+
+```{r}
+data %>% group_by(Industry) %>%  summarise(Sum_of_MECs = sum(MECs))
+```
+ 
+To sumif by a single condition we use filter first. Say we are only interested in MECs in primary industry
+```{r}
+data %>% filter(Industry == "Primary") %>% group_by(Industry) %>%  summarise(Sum_of_MECs = sum(MECs))
+```
+  
+  
+To run a sumifs we simply group_by multiple variables. 
+```{r}
+data %>% group_by(Industry,Area) %>%  summarise(Sum_of_MECs = sum(MECs))
+```
+
+

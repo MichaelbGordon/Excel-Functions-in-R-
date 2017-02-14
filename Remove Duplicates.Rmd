@@ -1,0 +1,43 @@
+---
+title: "Remove Duplicates"
+author: "Michael Gordon"
+date: "10 February 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data and Packages
+
+The function used to remove duplicates in distinct() from the dplyr package
+Lets create a data set. This made up data set is a list of every country John Smith has visited and the years he went
+```{r cars}
+# Packages
+library(dplyr)
+# Data set
+years <- c("2008","2010","2010","2010","2010","2010","2010","2011","2011","2011","2012","2012","2012","2014","2014","2014","2016","2016")
+Countries <- c("Australia","Fiji","Samoa","USA","Australia","Australia","USA","England","Italy","Australia","Australia","Fiji","Australia","France","Germany","Japan","Australia","USA")
+
+holiday_data <- data.frame(years,Countries)
+head(holiday_data,18)
+```
+
+## Remove Duplicates
+
+What years did John Smith Travel?
+```{r }
+holiday_data %>%  distinct(years)
+```
+
+What countries has John Smith been too?
+```{r}
+holiday_data %>%  distinct(Countries)
+```
+
+How many unqiue country-year combinations are there?
+```{r}
+holiday_data %>%  distinct(years, Countries)
+```
+
